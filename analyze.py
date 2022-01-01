@@ -9,7 +9,7 @@ movieNames = [] # Movie Names
 years = [] # Release Years
 genres = [] # Movie Genres
 imdbRatings = [] # IMDB Ratings
-moviePoster = [] # Movie Poster
+poster = [] # Movie Poster
 
 # For monitoring request frequency
 startTime = time.time()
