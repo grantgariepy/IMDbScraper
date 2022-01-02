@@ -55,45 +55,38 @@ for i in range(1, 50 + 1, 50):
 		link = container.a
 		imdbLink.append(link['href'])
 
-		for i in range(1):
+		
 
-			url = ('https://www.imdb.com' + link['href'])
-			print(url)
+		url = ('https://www.imdb.com' + link['href'])
+		print(url)
 
-			try:
-				response = requests.get(url, headers = {"Accept-Language": "en-US, \
-					en;q=0.5"})
-				response.raise_for_status()
+		try:
+			response = requests.get(url, headers = {"Accept-Language": "en-US, \
+				en;q=0.5"})
+			response.raise_for_status()
 
-			# Throw warning in case of errors
-			except requests.exceptions.RequestException as excep:
-				print(f'\nThere was a problem:\n{excep}')
-				sys.exit()
+		# Throw warning in case of errors
+		except requests.exceptions.RequestException as excep:
+			print(f'\nThere was a problem:\n{excep}')
+			sys.exit()
 
-			# Pause the loop
-			time.sleep(randint(1,4))
+		# Pause the loop
+		time.sleep(randint(1,4))
 
-			# Monitor the request frequency
-			reqNum += 0
-			elapsedTime = time.time() - startTime
-			print(f"Requesting...")
+		# Parse the HTML Contents
+		imdbSoup = bs(response.text, 'lxml')
+		linkContainers = imdbSoup.find_all('div', \
+			class_ = 'ipc-media ipc-media--poster-27x40 ipc-image-media-ratio--poster-27x40 ipc-media--baseAlt ipc-media--poster-l ipc-poster__poster-image ipc-media__img',)
 
-			# Parse the HTML Contents
-			imdbSoup = bs(response.text, 'lxml')
-			linkContainers = imdbSoup.find_all('div', \
-				class_ = 'ipc-media ipc-media--poster-27x40 ipc-image-media-ratio--poster-27x40 ipc-media--baseAlt ipc-media--poster-l ipc-poster__poster-image ipc-media__img',)
-
-			for container in linkContainers:
-				# Poster
-				poster = container.img
-				imdbPoster.append(poster['src'])
-				print(imdbPoster)	
+		for containerTwo in linkContainers:
+			# Poster
+			poster = containerTwo.img
+			imdbPoster.append(poster['src'])
+			print(imdbPoster)	
 
 		# # Release Year
 		# year = container.h3.find('span', class_ = 'lister-item-year').text
 		# years.append(int(year[-5:-1]))
-
-		
 
 print()
 
@@ -103,7 +96,7 @@ movieRatings = pd.DataFrame({
 # 'Year': years,
 # 'Genre': genres,
 # 'IMDB Rating': imdbRatings,
-# 'Poster': imdbPoster,
+'Poster': imdbPoster,
 'Link': imdbLink,
 })
 
