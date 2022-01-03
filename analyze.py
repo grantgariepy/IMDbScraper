@@ -1,16 +1,18 @@
 import sys
 import time
 from random import randint
+from numpy import array
 import requests
 from bs4 import BeautifulSoup as bs
 import pandas as pd
 
-movieNames = [] # Movie Names
+df = pd.DataFrame(columns = ['Name', 'Poster', 'Link'])
+
+movieName = '' # Movie Names
+moviePoster = '' # Movie Poster
+movieLink = '' # URL for movie page
+
 # years = [] # Release Years
-# genres = [] # Movie Genres
-# imdbRatings = [] # IMDB Ratings
-imdbPoster = [] # Movie Poster
-imdbLink = [] # URL for movie page
 
 # For monitoring request frequency
 startTime = time.time()
@@ -18,7 +20,7 @@ reqNum = 0
 
 print("Fetching Webpages...")
 
-for i in range(1, 50 + 1, 50):
+for i in range(1, 20):
 	url = ('https://www.imdb.com/chart/top/')
 
 	# Make a get request
@@ -48,18 +50,14 @@ for i in range(1, 50 + 1, 50):
 
 		# Movie Name
 		name = container.a.text
-		movieNames.append(name)
-		print(name)
-
+		movieName = name
+		
 		#IMDB Link
 		link = container.a
-		imdbLink.append(link['href'])
-
+		movieLink = link['href']
 		
-
 		url = ('https://www.imdb.com' + link['href'])
-		print(url)
-
+		
 		try:
 			response = requests.get(url, headers = {"Accept-Language": "en-US, \
 				en;q=0.5"})
@@ -81,8 +79,15 @@ for i in range(1, 50 + 1, 50):
 		for containerTwo in linkContainers:
 			# Poster
 			poster = containerTwo.img
-			imdbPoster.append(poster['src'])
-			print(imdbPoster)	
+			moviePoster = poster['src']
+			print(moviePoster)
+			print(movieName)
+
+		df2 = pd.DataFrame([[movieName, moviePoster, movieLink]], columns=['Name', 'Poster', 'Link'])
+		df = df.append(df2, ignore_index=True)
+		df.to_json('movieRatings.json')
+		print(df)
+
 
 		# # Release Year
 		# year = container.h3.find('span', class_ = 'lister-item-year').text
@@ -90,16 +95,7 @@ for i in range(1, 50 + 1, 50):
 
 print()
 
-# Create DataFrame of Movie Data
-movieRatings = pd.DataFrame({
-'Movie': movieNames,
-# 'Year': years,
-# 'Genre': genres,
-# 'IMDB Rating': imdbRatings,
-'Poster': imdbPoster,
-'Link': imdbLink,
-})
 
-# Export data to .csv
-movieRatings.to_csv('movieRatings.csv', encoding = 'utf-8', index = True)
-print("Data Exported to movieRatings.csv")
+
+
+
